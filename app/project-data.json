@@ -1,0 +1,46 @@
+{
+  "projects": [
+    {
+      "name": "Mobile App Redesign",
+      "owner": "Sarah Johnson",
+      "status": "Active",
+      "recentActivity": "2026-06-25",
+      "priority": "High"
+    },
+    {
+      "name": "API Documentation Overhaul",
+      "owner": "Marcus Chen",
+      "status": "Active",
+      "recentActivity": "2026-06-24",
+      "priority": "Medium"
+    },
+    {
+      "name": "Database Migration",
+      "owner": "Elena Rodriguez",
+      "status": "At-Risk",
+      "recentActivity": "2026-06-20",
+      "priority": "High"
+    },
+    {
+      "name": "Customer Portal Update",
+      "owner": "James Wilson",
+      "status": "Active",
+      "recentActivity": "2026-06-26",
+      "priority": "Medium"
+    },
+    {
+      "name": "Q2 Security Audit",
+      "owner": "Lisa Park",
+      "status": "Completed",
+      "recentActivity": "2026-06-15",
+      "priority": "High"
+    },
+    {
+      "name": "Design System v2.0",
+      "owner": "Alex Thompson",
+      "status": "At-Risk",
+      "recentActivity": "2026-06-19",
+      "priority": "Low"
+    }
+  ]
+}

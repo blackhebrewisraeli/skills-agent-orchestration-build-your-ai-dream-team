@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project Pulse</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="dashboard">
+      <header>
+        <h1>Project Pulse</h1>
+        <p class="subtitle">Track your project status at a glance</p>
+      </header>
+
+      <main>
+        <div class="projects-grid" role="region" aria-label="Projects">
+          <!-- Project cards will be rendered here by JavaScript -->
+        </div>
+      </main>
+    </div>
+
+    <script>
+      /**
+       * Project Pulse Dashboard - Dynamic Card Rendering
+       * Fetches project data and renders project cards
+       */
+
+      async function loadProjects() {
+        try {
+          // Fetch project data
+          const response = await fetch("project-data.json");
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+
+          // Validate data structure
+          if (!data.projects || !Array.isArray(data.projects)) {
+            throw new Error("Invalid data structure: missing or invalid projects array");
+          }
+
+          // Render project cards
+          renderProjectCards(data.projects);
+        } catch (error) {
+          console.error("Error loading projects:", error);
+          displayErrorMessage(error.message);
+        }
+      }
+
+      /**
+       * Render project cards to the DOM
+       * @param {Array} projects - Array of project objects
+       */
+      function renderProjectCards(projects) {
+        const grid = document.querySelector(".projects-grid");
+        if (!grid) {
+          console.error("Grid container not found");
+          return;
+        }
+
+        // Clear existing content
+        grid.innerHTML = "";
+
+        // If no projects, show message
+        if (projects.length === 0) {
+          grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #666666;">No projects found.</p>';
+          return;
+        }
+
+        // Render each project card
+        projects.forEach((project) => {
+          const card = createProjectCard(project);
+          grid.appendChild(card);
+        });
+      }
+
+      /**
+       * Create a project card element
+       * @param {Object} project - Project data object
+       * @returns {HTMLElement} Project card article element
+       */
+      function createProjectCard(project) {
+        const article = document.createElement("article");
+        article.className = "project-card";
+        article.setAttribute("tabindex", "0");
+        article.setAttribute("role", "article");
+
+        // Extract data with defaults
+        const name = project.name || "Untitled Project";
+        const status = project.status || "Active";
+        const priority = project.priority || "Medium";
+        const recentActivity = project.recentActivity || "Unknown";
+        const owner = project.owner || "Unassigned";
+
+        // Format the activity date
+        const activityDate = formatDate(recentActivity);
+
+        // Create status badge CSS class
+        const statusClass = `status-${status.toLowerCase().replace("-", "")}`;
+
+        // Create priority CSS class and label
+        const priorityClass = `priority-${priority.toLowerCase()}`;
+        const priorityLabel = `${priority} Priority`;
+
+        // Build card content
+        article.innerHTML = `
+          <h2>${escapeHtml(name)}</h2>
+          <div class="card-divider"></div>
+          <div class="card-status-section">
+            <div class="card-section">
+              <span class="status-badge ${statusClass}">${escapeHtml(status)}</span>
+              <div class="priority-indicator ${priorityClass}">
+                <span class="priority-dot"></span>
+                <span class="priority-label">${escapeHtml(priorityLabel)}</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-activity-section">
+            <div class="activity-label">Recent Activity</div>
+            <div class="activity-date">${escapeHtml(activityDate)}</div>
+            <p class="visually-hidden">Project owned by ${escapeHtml(owner)}</p>
+            <p class="visually-hidden">Status: ${escapeHtml(status)}</p>
+            <p class="visually-hidden">Priority: ${escapeHtml(priorityLabel)}</p>
+          </div>
+        `;
+
+        return article;
+      }
+
+      /**
+       * Format date string to human-readable format
+       * @param {string} dateString - ISO date string (e.g., "2026-06-25")
+       * @returns {string} Formatted date (e.g., "Jun 25, 2026")
+       */
+      function formatDate(dateString) {
+        try {
+          const date = new Date(dateString + "T00:00:00Z");
+          if (isNaN(date.getTime())) {
+            return dateString;
+          }
+          return date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          });
+        } catch {
+          return dateString;
+        }
+      }
+
+      /**
+       * Escape HTML to prevent XSS attacks
+       * @param {string} text - Text to escape
+       * @returns {string} Escaped HTML-safe text
+       */
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      /**
+       * Display error message in the grid
+       * @param {string} message - Error message
+       */
+      function displayErrorMessage(message) {
+        const grid = document.querySelector(".projects-grid");
+        if (grid) {
+          grid.innerHTML = `<p style="grid-column: 1/-1; color: #dc2626; text-align: center;">Error loading projects: ${escapeHtml(message)}</p>`;
+        }
+      }
+
+      // Load projects when DOM is ready
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", loadProjects);
+      } else {
+        loadProjects();
+      }
+    </script>
+  </body>
+</html>
